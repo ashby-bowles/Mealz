@@ -11,15 +11,21 @@ import Subtitle from "../components/MealDetail/Subtitle";
 import IconButton from "../components/IconButton";
 import List from "../components/MealDetail/List";
 import { MEALS } from "../data/dummy-data";
-import { useLayoutEffect } from "react";
+import { useContext, useLayoutEffect } from "react";
+import { FavoritesContext } from "../store/context/favorites-context";
 
 function MealsDetailsScreen({ route, navigation }) {
+  const favoriteMealsCtx = useContext(FavoritesContext);
   const mealId = route.params.mealId;
-
   const selectedMeal = MEALS.find((meal) => meal.id === mealId);
+  const mealIsFavorite = favoriteMealsCtx.ids.includes(mealId);
 
-  function headerButtonPressHandler() {
-    console.log("Pressed!");
+  function changeFavoriteStatusHandler() {
+    if (mealIsFavorite) {
+      favoriteMealsCtx.removeFavorite(mealId);
+    } else {
+      favoriteMealsCtx.addFavorite(mealId);
+    }
   }
 
   useLayoutEffect(() => {
@@ -27,14 +33,14 @@ function MealsDetailsScreen({ route, navigation }) {
       headerRight: () => {
         return (
           <IconButton
-            onPress={headerButtonPressHandler}
+            onPress={changeFavoriteStatusHandler}
             color="grey"
-            icon="star"
+            icon={mealIsFavorite ? "star" : "star-outline"}
           />
         );
       },
     });
-  }, [navigation, headerButtonPressHandler]);
+  }, [navigation, changeFavoriteStatusHandler]);
 
   return (
     <ScrollView>
